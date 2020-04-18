@@ -1,0 +1,28 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html >
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<title>Photo Storage</title>
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="static/css/main.css">
+	</head>
+	<body class="custom-body">
+		<div class="custom-header-container">
+			<header class="custom-wrapper">
+				<h1>Photo Storage</h1>
+			</header>
+		</div>
+		<div class="main-container">
+			{{template "mainblock" .}}
+		</div>
+		<div class="custom-footer-container">
+			<footer class="custom-footer">
+				<h5>&copy; Created by <a href="https://github.com/giantpanda9">Nikolay Chegodaev</a></h5>
+			</footer>
+		</div>
+	</body>
+</html>
+{{end}}

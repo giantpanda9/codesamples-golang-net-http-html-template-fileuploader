@@ -1,0 +1,18 @@
+{{define "mainblock"}}
+<!DOCTYPE html>
+
+		<!--Errors container-->
+		
+			<div class="main-data-block response-message-color info-strong"></div>
+		
+		<div class="main-data-block">
+			<form action="/uploadFile" method="POST" enctype="multipart/form-data">
+				<div class="main-data-block-item"><label for="fileName">File name* : </label><input type="text" id="fileName" name="fileName"></div>
+				<div class="main-data-block-item tip-small-font">*Tip 1: If File name field left blank - initial file name will used</div>
+				<div class="main-data-block-item tip-small-font">*Tip 2: Please input file name into File name field without extension</div>
+				<div class="main-data-block-item"><input type="file" name="file"></div>
+				<div class="main-data-block-item"><button type="submit">Upload photo</button></div>
+				<div class="main-data-block-item">Click <a href="/readme">here</a> to read detailed instructions</div>
+			</form>
+		</div>
+{{end}}
