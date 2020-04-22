@@ -12,29 +12,31 @@ import (
 func uploadFileHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseMultipartForm(10 << 20)
 	customFileName := r.Form.Get("fileName")
-	fileLink, fileObject, err := r.FormFile("file")
+	fileLink, fileHeader, err := r.FormFile("file")
 	if err != nil {
 		fmt.Println("Error Retrieving the File")
 		fmt.Println(err)
 		return
 	}
+
 	defer fileLink.Close()
 	if customFileName != "" {
-		fileExtension := filepath.Ext(fileObject.Filename)
+		fileExtension := filepath.Ext(fileHeader.Filename)
 		customFileName = customFileName + fileExtension
 	} else {
-		customFileName = fileObject.Filename
+		customFileName = fileHeader.Filename
 	}
 	fmt.Printf("Name: %+v\n", customFileName)
-	fmt.Printf("Size: %+v\n", fileObject.Size)
-	fmt.Printf("MIME: %+v\n", fileObject.Header)
+	fmt.Printf("Size: %+v\n", fileHeader.Size)
+	fmt.Printf("MIME: %+v\n", fileHeader.Header)
 	
 	newFileContents, err := ioutil.ReadAll(fileLink)
 	if err != nil {
 		fmt.Println(err)
 	}
-	ioutil.WriteFile("static/data/images/" + customFileName, newFileContents, 0644)
 	
+	response := uploadFile(newFileContents , customFileName)
+	fmt.Printf("Upload file response: %+v\n", response)
 	http.Redirect(w, r, "/", 301)
 }
 
