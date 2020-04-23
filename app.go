@@ -2,11 +2,11 @@ package main
 
 import (
 	"html/template"
-	"io/ioutil"
 	"fmt"
 	"net/http"
 	"log"
 	"path/filepath"
+
 )
 
 func uploadFileHandler(w http.ResponseWriter, r *http.Request) {
@@ -29,13 +29,8 @@ func uploadFileHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Name: %+v\n", customFileName)
 	fmt.Printf("Size: %+v\n", fileHeader.Size)
 	fmt.Printf("MIME: %+v\n", fileHeader.Header)
-	
-	newFileContents, err := ioutil.ReadAll(fileLink)
-	if err != nil {
-		fmt.Println(err)
-	}
-	
-	response := uploadFile(newFileContents , customFileName)
+
+	response := uploadFile(fileLink , customFileName)
 	fmt.Printf("Upload file response: %+v\n", response)
 	http.Redirect(w, r, "/", 301)
 }

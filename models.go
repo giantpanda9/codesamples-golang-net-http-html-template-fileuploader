@@ -1,25 +1,38 @@
 package main
 
 import (
-	"io/ioutil"
+	//"io/ioutil"
 	"fmt"
 	"github.com/disintegration/imaging"
+	"io"
+	"image"
+
 )
 
-func createThubmnail(pathToImageUploaded string, customFileName string) int {
-	uploadedImage := pathToImageUploaded  + customFileName
-	uploadedImageLink, err := imaging.Open(uploadedImage)
-	if err != nil {
-		fmt.Println("Error creating thumbnail")
-		fmt.Println(err)
-	}
-	thumbnail := imaging.Thumbnail(uploadedImageLink, 80, 80, imaging.CatmullRom)
+
+
+func createThubmnail(imageObject image.Image, customFileName string) int {
+	thumbnail := imaging.Thumbnail(imageObject, 80, 80, imaging.CatmullRom)
 	imaging.Save(thumbnail, "static/data/thumbnails/thumbnail_" + customFileName)
 	return 0
 }
+
+func createImage(imageObject image.Image, customFileName string) int {
+	err := imaging.Save(imageObject, "static/data/images/" + customFileName)
+	if err != nil {
+		fmt.Println(err)
+	}
+	return 0
+}
 //fileLink io.Reader for now not needed {name type} reserved for possible future use
-func uploadFile(newFileContents []uint8, customFileName string) int {	
-	ioutil.WriteFile("static/data/images/" + customFileName, newFileContents, 0644)
-	createThubmnail("static/data/images/",  customFileName) 
+func uploadFile(fileLink io.Reader, customFileName string) int {
+	imageObject, _, err := image.Decode(fileLink)
+	if err != nil {
+		fmt.Println("Error creating image object")
+		fmt.Println(err)
+	}
+
+	createImage(imageObject,  customFileName) 
+	createThubmnail(imageObject,  customFileName) 
 	return 0
 }
