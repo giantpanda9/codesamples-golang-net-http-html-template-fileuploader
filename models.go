@@ -30,9 +30,9 @@ func uploadFile(fileLink io.Reader, customFileName string) int {
 	if err != nil {
 		fmt.Println("Error creating image object")
 		fmt.Println(err)
+	} else {
+		createImage(imageObject,  customFileName) 
+		createThubmnail(imageObject,  customFileName) 
 	}
-
-	createImage(imageObject,  customFileName) 
-	createThubmnail(imageObject,  customFileName) 
 	return 0
 }
