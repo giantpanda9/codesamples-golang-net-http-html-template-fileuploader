@@ -39,7 +39,16 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	indexPageTemplate:= template.Must(template.ParseFiles("templates/index.html", "templates/base.html"))
 	var data []int
 	err := indexPageTemplate.ExecuteTemplate(w, "base", data)
-	if err != nil {		
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func readmeHandler(w http.ResponseWriter, r *http.Request) {
+	readmePageTemplate:= template.Must(template.ParseFiles("templates/instructions.html", "templates/base.html"))
+	var data []int
+	err := readmePageTemplate.ExecuteTemplate(w, "base", data)
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
@@ -47,6 +56,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/uploadFile", uploadFileHandler)
+	http.HandleFunc("/readme", readmeHandler)
 	fs := http.FileServer(http.Dir("./static"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 	log.Fatal(http.ListenAndServe(":8080", nil))

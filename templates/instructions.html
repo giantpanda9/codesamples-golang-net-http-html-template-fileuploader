@@ -1,0 +1,14 @@
+{{define "mainblock"}}
+<!DOCTYPE html>
+		<div class="main-info-instructions">
+			<p>Instructions:</p>
+			<hr/>
+			<p>Please populate File name with the expected file name without extension</p>
+			<p>If File name field will be left blank then the system will use existent file name</p>
+			<p class="info-strong">Example 1: </p>
+			<p>you have uploaded file named "test.jpg", but you have populated File name: text field with name test_upload (note: no extension) - resulting file will have name: "test_upload.jpg"</p>
+			<p class="info-strong">Example 2:  </p>
+			<p> you have uploaded file named "test_initial_name.jpg", but you have left the File name: text field empty - resulting file will have name: "test_initial_name.jpg"</p>
+			<p>You may return to the <a href="/">main page</a>, if you so wish</p>
+		</div>
+{{end}}
