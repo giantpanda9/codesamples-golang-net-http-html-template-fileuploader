@@ -2,9 +2,9 @@
 <!DOCTYPE html>
 
 		<!--Errors container-->
-		
-		<div class="main-data-block response-message-color info-strong"></div>
-		
+		{{ if .message }}
+		<div class="main-data-block response-message-color info-strong">{{ .message }}</div>
+		{{ end }}
 		<div class="main-data-block">
 			<form action="/uploadFile" method="POST" enctype="multipart/form-data">
 				<div class="main-data-block-item"><label for="fileName">File name* : </label><input type="text" id="fileName" name="fileName"></div>
@@ -15,4 +15,37 @@
 				<div class="main-data-block-item">Click <a href="/readme">here</a> to read detailed instructions</div>
 			</form>
 		</div>
+		<!--Uploaded photos container-->
+				<div class="main-data-block">
+					{{ if not .filesData}}
+						<p>No images available.</p>
+					{{ else }}
+						<form action="/deleteImage" method="POST" enctype="multipart/form-data">
+							<table border="1" class="table-class">
+								<tr>
+									<th>Preview</th>
+									<th>Photo Name</th>
+									<th>EXIF Camera Make</th>
+									<th>EXIF Camera Model</th>
+									<th>File size</th>
+									<th>Date Created</th>
+									<th>Date Uploaded</th>
+									<th>Delete?</th>
+								</tr>
+								{{- range .filesData}}
+									<tr>
+										<td><a href="{{ .PathToImage }}" target="_blank"><img src="{{ .PathToThumbnail }}"></a></td>
+										<td> {{ .FileName }} </td>
+										<td> {{ .EXIFCameraMake }} </td>
+										<td> {{ .EXIFCameraModel }} </td>
+										<td> {{ .FileSize }} </td>
+										<td> {{ .EXIFDateCreated }} </td>
+										<td> {{ .UploadDate }} </td>
+										<td><button type="submit" name="delete" value="{{ .FileName }}">Delete</button></td>
+									</tr>
+								{{ end }}
+							</table>
+						</form>
+					{{ end }}
+				</div>
 {{end}}

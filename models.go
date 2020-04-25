@@ -28,10 +28,10 @@ func getFilesData() filesDataReturnType {
 				outputFileInformation:= map[string]string{}
 				stat_t := info.Sys().(*syscall.Stat_t)
 				outputFileInformation["FileName"] = string(filepath.Base(existingImageFilePath))
+				outputFileInformation["PathToImage"] = "static/data/images/" + outputFileInformation["FileName"]
 				outputFileInformation["PathToThumbnail"] = "static/data/thumbnails/thumbnail_" + outputFileInformation["FileName"]
 				outputFileInformation["UploadDate"] = (timespecToTime(stat_t.Ctim)).String()
 				outputFileInformation["FileSize"] = strconv.FormatInt(stat_t.Size,10)
-				fmt.Println("Obtaining EXIF data for " + existingImageFilePath)
 				parser := exif.New()
 				err := parser.Open(existingImageFilePath)
 				if err != nil {
@@ -52,6 +52,7 @@ func getFilesData() filesDataReturnType {
 						outputFileInformation["EXIFCameraModel"] = v
 					}
 				}
+				
 				outputDataSlice = append(outputDataSlice, outputFileInformation)
 			}
 			return nil
@@ -62,7 +63,7 @@ func getFilesData() filesDataReturnType {
 		}
 
 		
-	return outputDataSlice
+	return outputDataSlice[1:]
 }
 
 func diff(a, b uint32) int64 {
@@ -142,13 +143,34 @@ func createThubmnail(imageObject image.Image, customFileName string) int {
 	return 0
 }
 
-func errorsInterpreter(errorCode int) string {
-	errorMessage := map[int]string{
-		0: "Image uploaded successfully",
-		1: "File is not a raster image",
-		2: "Image already exists",
+func errorsInterpreter(errorCode string) string {
+	errorMessage := map[string]string{
+		"0": "Image uploaded successfully",
+		"1": "File is not a raster image",
+		"2": "Image already exists",
+		"3": "Error removing image",
+		"4": "Error removing thumbnail",
+		"5": "Image removed successfully",
 	}
 	return errorMessage[errorCode]
+}
+
+func deleteImages(fileName string) int {
+	imagePath := "static/data/images/" + fileName
+	thumbnailPath := "static/data/thumbnails/thumbnail_" + fileName
+	err := os.Remove(imagePath)
+	if err != nil {
+		fmt.Println("Error removing image")
+		fmt.Println(err)
+		return 3
+	}
+	err = os.Remove(thumbnailPath)
+	if err != nil {
+		fmt.Println("Error removing thumbnail")
+		fmt.Println(err)
+		return 4
+	}
+	return 5
 }
 
 func uploadFile(fileLink io.ReadSeeker, customFileName string) int {

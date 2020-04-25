@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"log"
 	"path/filepath"
-
+	"strconv"
 )
 
 func uploadFileHandler(w http.ResponseWriter, r *http.Request) {
@@ -26,21 +26,33 @@ func uploadFileHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		customFileName = fileHeader.Filename
 	}
-	fmt.Printf("Name: %+v\n", customFileName)
-	fmt.Printf("Size: %+v\n", fileHeader.Size)
-	fmt.Printf("MIME: %+v\n", fileHeader.Header)
-
 	response := uploadFile(fileLink , customFileName)
-	responseText := errorsInterpreter(response)
-	fmt.Printf("Upload file response: %+v\n", responseText)
-	http.Redirect(w, r, "/", 301)
+
+	http.Redirect(w, r, "/?msg=" + strconv.Itoa(response), 301)
+}
+
+func deleteImageHandler(w http.ResponseWriter, r *http.Request) {
+	r.ParseMultipartForm(10 << 20)
+	fileName := r.Form.Get("delete")
+	response := deleteImages(fileName)
+	http.Redirect(w, r, "/?msg=" + strconv.Itoa(response), 301)
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	indexPageTemplate:= template.Must(template.ParseFiles("templates/index.html", "templates/base.html"))
-	var data []int
+
 	filesData := getFilesData()
-	fmt.Printf("%v\n", filesData)
+	msg := ""
+	for k, v := range r.URL.Query() {
+		if k == "msg" {
+			msg = errorsInterpreter(v[0])
+			break
+		}
+	}
+	data := map[string]interface{}{
+		"message": msg,
+		"filesData": filesData,
+	}
 	err := indexPageTemplate.ExecuteTemplate(w, "base", data)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -59,6 +71,7 @@ func readmeHandler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/uploadFile", uploadFileHandler)
+	http.HandleFunc("/deleteImage", deleteImageHandler)
 	http.HandleFunc("/readme", readmeHandler)
 	fs := http.FileServer(http.Dir("./static"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
