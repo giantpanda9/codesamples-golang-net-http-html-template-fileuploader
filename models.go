@@ -94,18 +94,8 @@ func checkImagesEqual(imageObject1 image.Image, imageObject2 image.Image) int {
 		}
 	}
 	nPixels := (boundsImageObject1.Max.X - boundsImageObject1.Min.X) * (boundsImageObject1.Max.Y - boundsImageObject1.Min.Y)
-	// At this point I need to accept a certain limitations as sometimes uploaded image somewhat different from the same image being loading
-	// for example at test run I got Image difference of 0.213817% for exactly the same images, but were already uploaded and the other one was the source
-	// Difference appeared due to many factors - poor test photo quality, changes applied by github.com/disintegration/imaging I can of course use os.Create ...
-	// and other Go lang native ways to store the images, but I want image storage to be format independent and store it in the same format as uploaded image
-	// while Go natively supports Encode function only as "jpeg.Encode(", "png.Encode" and not supports image.Encode, while I want exactly format independent,
-	// github.com/disintegration/imaging allows me not to worry about the image formate while I store the image, but somehow changes the image -
-	// - most probably, improves quality, thus resulting in 0.213817% difference
 	imagesDifference := float64(sum*100)/(float64(nPixels)*0xffff*3)
-	// therefore I think it should be fine to check if imagesDifference variable is not greater than 1 and if so consider the images equal
-	// if imagesDifference variable is greater than zero than images are different, by for example contract changes or gamma changes, etc.
-	// i.e. if we have imagesDifference like 0.2xxxxx% then consider that images are equal if imagesDifference is like 1.xxxxxxx% then consider images different
-	if (imagesDifference < 1) {
+	if (imagesDifference <= 0) {
 		fmt.Printf("Images difference is %f%% considering equal\n", imagesDifference)
 		return 1
 	}
