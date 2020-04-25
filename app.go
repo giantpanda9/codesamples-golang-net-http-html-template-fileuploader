@@ -38,6 +38,8 @@ func uploadFileHandler(w http.ResponseWriter, r *http.Request) {
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	indexPageTemplate:= template.Must(template.ParseFiles("templates/index.html", "templates/base.html"))
 	var data []int
+	filesData := getFilesData()
+	fmt.Printf("%v\n", filesData)
 	err := indexPageTemplate.ExecuteTemplate(w, "base", data)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

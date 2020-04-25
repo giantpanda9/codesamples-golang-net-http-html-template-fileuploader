@@ -1,14 +1,69 @@
 package main
 
 import (
-	//"io/ioutil"
 	"fmt"
-	"github.com/disintegration/imaging"
 	"io"
 	"image"
 	"path/filepath"
 	"os"
+	"syscall"
+	"time"
+	"strconv"
+	"github.com/gosexy/exif"
+	"github.com/disintegration/imaging"
 )
+
+func timespecToTime(ts syscall.Timespec) time.Time {   
+	return time.Unix(int64(ts.Sec), int64(0))
+}
+
+type filesDataReturnType []map[string]string
+
+func getFilesData() filesDataReturnType {
+		outputDataSlice := make([]map[string]string, 1, 1)
+		
+		root := "static/data/images/"
+		err := filepath.Walk(root, func(existingImageFilePath string, info os.FileInfo, err error) error {
+			if existingImageFilePath != "static/data/images/" {
+				outputFileInformation:= map[string]string{}
+				stat_t := info.Sys().(*syscall.Stat_t)
+				outputFileInformation["FileName"] = string(filepath.Base(existingImageFilePath))
+				outputFileInformation["PathToThumbnail"] = "static/data/thumbnails/thumbnail_" + outputFileInformation["FileName"]
+				outputFileInformation["UploadDate"] = (timespecToTime(stat_t.Ctim)).String()
+				outputFileInformation["FileSize"] = strconv.FormatInt(stat_t.Size,10)
+				fmt.Println("Obtaining EXIF data for " + existingImageFilePath)
+				parser := exif.New()
+				err := parser.Open(existingImageFilePath)
+				if err != nil {
+					fmt.Println("Error obtaining EXIF data for " + existingImageFilePath)
+					fmt.Println(err)
+					outputFileInformation["EXIFDateCreated"] = ""
+					outputFileInformation["EXIFCameraMake"] = ""
+					outputFileInformation["EXIFCameraModel"] = ""
+				} 
+				for k, v := range parser.Tags {					
+					if k == "Date and Time (Digitized)" {
+						outputFileInformation["EXIFDateCreated"] = v
+					}
+					if k == "Manufacturer" {
+						outputFileInformation["EXIFCameraMake"] = v
+					}
+					if k == "Model" {
+						outputFileInformation["EXIFCameraModel"] = v
+					}
+				}
+				outputDataSlice = append(outputDataSlice, outputFileInformation)
+			}
+			return nil
+		})
+		if err != nil {
+			fmt.Println("Error opening running through existing files")
+			fmt.Println(err)
+		}
+
+		
+	return outputDataSlice
+}
 
 func diff(a, b uint32) int64 {
 	if a > b {
@@ -97,16 +152,9 @@ func createThubmnail(imageObject image.Image, customFileName string) int {
 	return 0
 }
 
-func createImage(imageObject image.Image, customFileName string) int {
-	err := imaging.Save(imageObject, "static/data/images/" + customFileName)
-	if err != nil {
-		fmt.Println(err)
-	}
-	return 0
-}
-//fileLink io.Reader for now not needed {name type} reserved for possible future use
-func uploadFile(fileLink io.Reader, customFileName string) int {
+func uploadFile(fileLink io.ReadSeeker, customFileName string) int {
 	imageObject, _, err := image.Decode(fileLink)
+	fileLink.Seek(0,0)
 	if err != nil {
 		fmt.Println("Error creating image object")
 		fmt.Println(err)
@@ -116,7 +164,18 @@ func uploadFile(fileLink io.Reader, customFileName string) int {
 		if (exists == 1) {
 			return 2
 		}
-		createImage(imageObject,  customFileName) 
+		// Copy the file as it was to preserve the EXIF data
+		destinationImage, err := os.Create("static/data/images/" + customFileName)
+		if err != nil {
+			fmt.Println(err)
+		}
+		defer destinationImage.Close()
+		_, err = io.Copy(destinationImage, fileLink)
+		if err != nil {
+			fmt.Println(err)
+		}
+		defer fileLink.Seek(0,0)
+		// Creating thumbnail using the github.com module to demonstrate ability to use those, if needed
 		createThubmnail(imageObject,  customFileName) 
 	}
 	return 0
