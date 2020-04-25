@@ -31,7 +31,8 @@ func uploadFileHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("MIME: %+v\n", fileHeader.Header)
 
 	response := uploadFile(fileLink , customFileName)
-	fmt.Printf("Upload file response: %+v\n", response)
+	responseText := errorsInterpreter(response)
+	fmt.Printf("Upload file response: %+v\n", responseText)
 	http.Redirect(w, r, "/", 301)
 }
 

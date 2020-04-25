@@ -142,6 +142,15 @@ func createThubmnail(imageObject image.Image, customFileName string) int {
 	return 0
 }
 
+func errorsInterpreter(errorCode int) string {
+	errorMessage := map[int]string{
+		0: "Image uploaded successfully",
+		1: "File is not a raster image",
+		2: "Image already exists",
+	}
+	return errorMessage[errorCode]
+}
+
 func uploadFile(fileLink io.ReadSeeker, customFileName string) int {
 	imageObject, _, err := image.Decode(fileLink)
 	fileLink.Seek(0,0)
