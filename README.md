@@ -1,6 +1,7 @@
 # codesamples-golang-net-http-html-template-fileuploader
 Go Lang net/http html/template file uploader
 # Installation
+Note: On Debian based OS like Ubuntu, not last one to follow
 1) Install go
 2) git clone the project
 3) go get github.com/disintegration/imaging
