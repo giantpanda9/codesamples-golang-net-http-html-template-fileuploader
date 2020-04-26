@@ -6,7 +6,7 @@ Note: On Debian based OS like Ubuntu, not last one to follow
 1) Install Go
 2) git clone the project
 3) go get github.com/disintegration/imaging
-4) sudo apt-get install libexif-dev
+4) sudo apt-get install libexif-dev [3]
 5) go get github.com/gosexy/exif [3]
 # How to run?
 1) cd /path/to/your/project/folder/path/to/codesamples-golang-net-http-html-template-fileuploader/
