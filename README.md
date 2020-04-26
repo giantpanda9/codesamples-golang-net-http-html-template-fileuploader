@@ -3,11 +3,11 @@
 2) Go Lang version of https://github.com/giantpanda9/codesamples-python3-flask-file-upload
 # Installation
 Note: On Debian based OS like Ubuntu, not last one to follow
-1) Install go
+1) Install Go
 2) git clone the project
 3) go get github.com/disintegration/imaging
 4) sudo apt-get install libexif-dev
-5) go get go get github.com/gosexy/exif [3]
+5) go get github.com/gosexy/exif [3]
 # How to run?
 1) cd /path/to/your/project/folder/path/to/codesamples-golang-net-http-html-template-fileuploader/
 2) go run app.go models.go
